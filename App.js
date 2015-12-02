@@ -88,7 +88,7 @@ function getID(url) {
 
 //Add value/text to dropdown list
 function addToDropdown(name, value, text) {
-    $(name).append($('<option/>').val(value).html(text));
+    $(name).append($('<option></option>').val(value).html(text));
 }
 
 function getItemColumns(listName, itemID, columns, callback) {
@@ -128,5 +128,40 @@ function getItemColumns(listName, itemID, columns, callback) {
         var taskItemData = Object.create(null)
         //alert('Error: ' + args.get_message() + '\n' + args.get_stackTrace());
         callback(taskItemData);
+    }
+}
+
+function setItemColumns(listName, itemID, columns, callback) {
+    //Get current app web context
+    var ctx = SP.ClientContext.get_current();
+    var spWEB = ctx.get_web();
+
+    //Get reference to the list
+    var oList = spWEB.get_lists().getByTitle(listName);
+
+    //Get reference to the ChainApprovalTasks item
+    var oListItem = oList.getItemById(itemID);
+
+    //Set item column to values in columns
+    for (var key in columns) {
+        try {
+            oListItem.set_item(key, columns[key]);
+        }
+        catch (err) {
+            //Nothing incase we overwrite existing value
+        }
+    }
+
+    //Mark item as updated
+    oListItem.update();
+
+    //Execute query
+    ctx.executeQueryAsync(function () { onQuerySucceeded(oListItem, columns) }, onQueryFailed);
+
+    function onQuerySucceeded(sender, args) {
+        callback(true);
+    }
+    function onQueryFailed(sender, args) {
+        callback(false);
     }
 }
