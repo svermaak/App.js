@@ -88,10 +88,10 @@ function getID(url) {
 
 //Add value/text to dropdown list
 function addToDropdown(name, value, text) {
-    $(name).append($('<option></option>').val(value).html(text));
+    $(name).append($('<option/>').val(value).html(text));
 }
 
-function loadItemFields(listName, itemID, columns, callback) {
+function getItemColumns(listName, itemID, columns, callback) {
     //Get current app web context
     var ctx = SP.ClientContext.get_current();
     var spWEB = ctx.get_web();
